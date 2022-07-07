@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BL;
+using DAL;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CoreWebApi.Controllers
 {
@@ -11,94 +11,71 @@ namespace CoreWebApi.Controllers
     [Route("[controller]")]
     public class BookStoreController : ControllerBase
     {
-        private readonly static List<Book> _books;
+        private readonly IBooksService _booksService;
         private readonly ILogger<BookStoreController> _logger;
-        static BookStoreController()
-        {
-            _books = new List<Book>();
-            _books.Add(new Book
-            {
-                Id = Guid.NewGuid(),
-                Author = "Bulgakov",
-                Title = "Master and Margarita",
-                Genre = "Novel",
-                Price = 5
 
-            }) ;
-        }
-
-        public BookStoreController(ILogger<BookStoreController> logger)
+        public BookStoreController(IBooksService booksService,  ILogger<BookStoreController> logger)
         {
+            _booksService = booksService;
             _logger = logger;
         }
 
         [HttpPost("add")]
-        public IActionResult Add(Book book)
+        public IActionResult AddBook(Book book)
         {
-            if (book != null)
+            try
             {
-                book.Id = Guid.NewGuid();
-                _books.Add(book);
+                var result = _booksService.AddBook(book);
 
-                return Created(book.Id.ToString(), book);
+                return Created(result.ToString(), book);
             }
-
-            return BadRequest();
+            catch(ArgumentException ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         [HttpGet("all")]
-        public IActionResult GetAll()
+        public IEnumerable<Book> GetAllBooks()
         {
-            return Ok(_books);
+            return _booksService.GetAllBooks();
         }
 
         [Route("[action]/{id}")]
         [HttpGet]
-        public IActionResult GetById(Guid id)
+        public Book GetBookById(Guid id)
         {
-            var book = _books.FirstOrDefault(x => x.Id == id);
-
-            return book != null ? Ok(book) : NotFound();
+            return _booksService.GetBookById(id);
         }
 
         [Route("[action]/{author}")]
         [HttpGet]
-        public IActionResult GetByAuthor(string author)
+        public IEnumerable<Book> GetBooksByAuthor(string author)
         {
-            var bookList = _books.TakeWhile(car => car.Author == author);
-
-            return bookList != null ? Ok(bookList) : NotFound();
+            return _booksService.GetBookByAuthor(author);
         }
 
-        [HttpPut]
-        public IActionResult Update(Book book)
+        [HttpPut("{id}")]
+        public IActionResult UpdateBook(Guid id, Book book)
         {
-            var dbBook = _books.FirstOrDefault(x => x.Id == book.Id);
-
-            if (dbBook != null)
+            try
             {
-                var index = _books.IndexOf(dbBook);
-                _books[index] = book;
+                book.Id = id;
 
-                return StatusCode(200);
+                var result = _booksService.UpdateBook(book);
+
+                return Created(result.ToString(), book);
             }
-
-            return StatusCode(404);
+            catch (ArgumentException ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
-        public IActionResult RemoveById(Guid id)
+        public bool RemoveBook(Guid id)
         {
-            var dbBook = _books.FirstOrDefault(x => x.Id == id);
-
-            if(dbBook != null)
-            {
-                _books.Remove(dbBook);
-
-                return StatusCode(200);
-            }
-
-            return StatusCode(404);
+            return _booksService.RemoveBookById(id);
         }
     }
 }
