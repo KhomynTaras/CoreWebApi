@@ -1,9 +1,12 @@
 ﻿using BL;
+using BL.Services;
 using DAL;
+using DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CoreWebApi.Controllers
 {
@@ -21,61 +24,61 @@ namespace CoreWebApi.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddBook(Book book)
+        public async Task<IActionResult> AddBook(Book book)
         {
             try
             {
-                var result = _booksService.AddBook(book);
+                var result = await _booksService.AddBook(book);
 
                 return Created(result.ToString(), book);
             }
             catch(ArgumentException ex)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
         [HttpGet("all")]
-        public IEnumerable<Book> GetAllBooks()
+        public async Task<IEnumerable<Book>> GetAllBooks()
         {
-            return _booksService.GetAllBooks();
+            return await _booksService.GetAllBooks();
         }
 
         [Route("[action]/{id}")]
         [HttpGet]
-        public Book GetBookById(Guid id)
+        public async Task<Book> GetBookById(Guid id)
         {
-            return _booksService.GetBookById(id);
+            return await _booksService.GetBookById(id);
         }
 
-        [Route("[action]/{author}")]
-        [HttpGet]
-        public IEnumerable<Book> GetBooksByAuthor(string author)
-        {
-            return _booksService.GetBookByAuthor(author);
-        }
+        //[Route("[action]/{author}")]
+        //[HttpGet]
+        //public IEnumerable<Book> GetBooksByAuthor(string author)
+        //{
+        //    return _booksService.GetBookByAuthor(author);
+        //}
 
         [HttpPut("{id}")]
-        public IActionResult UpdateBook(Guid id, Book book)
+        public async Task<IActionResult> UpdateBook(Guid id, Book book)
         {
             try
             {
                 book.Id = id;
 
-                var result = _booksService.UpdateBook(book);
+                var result = await _booksService.UpdateBook(book);
 
                 return Created(result.ToString(), book);
             }
             catch (ArgumentException ex)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
         [HttpDelete("{id}")]
-        public bool RemoveBook(Guid id)
+        public async Task<bool> RemoveBook(Guid id)
         {
-            return _booksService.RemoveBookById(id);
+            return await _booksService.RemoveBookById(id);
         }
     }
 }

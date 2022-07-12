@@ -1,5 +1,6 @@
-using BL;
-using DAL;
+using BL.Services;
+using DAL.Contexts;
+using DAL.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -38,7 +39,7 @@ namespace CoreWebApi
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CoreWebApi", Version = "v1" });
             });
 
-            services.AddScoped<IBooksRepository, BooksRepository>();
+            services.AddScoped(typeof(IGerericRepository<>), typeof(GerericRepository<>));
             services.AddScoped<IBooksService, BooksService>();
         }
 

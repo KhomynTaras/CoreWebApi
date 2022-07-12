@@ -1,13 +1,11 @@
-﻿using System;
+﻿using DAL.Entities;
+using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace DAL
+namespace DAL.Entities
 {
-    public class Book
+    public class Book : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
-
         [Required]
         public string Genre { get; set; }
 

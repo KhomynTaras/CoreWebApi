@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DAL.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace DAL
+namespace DAL.Contexts
 {
     public class EFCoreDBContext : DbContext
     {
