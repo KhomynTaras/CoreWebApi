@@ -1,7 +1,5 @@
-﻿using BL;
-using BL.Services;
-using DAL;
-using DAL.Entities;
+﻿using BL.Services;
+using DataAccessLayer.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;

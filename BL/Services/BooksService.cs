@@ -1,5 +1,5 @@
-﻿using DAL.Entities;
-using DAL.Repositories;
+﻿using DataAccessLayer.Entities;
+using DataAccessLayer.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ namespace BL.Services
         }
         public async Task<Guid> AddBook(Book book)
         {
-            ValidateBookState(book);
+            //ValidateBookState(book);
 
             return await _booksRepository.Add(book);
         }
@@ -38,17 +38,17 @@ namespace BL.Services
 
         public async Task<bool> UpdateBook(Book book)
         {
-            ValidateBookState(book);
+            //ValidateBookState(book);
 
             return await _booksRepository.Update(book);
         }
 
-        private void ValidateBookState(Book book)
-        {
-            if (book.PageCount < 10 || book.PageCount > 2000)
-            {
-                throw new ArgumentException("Ivalid pages count");
-            }
-        }
+        //private void ValidateBookState(Book book)
+        //{
+        //    if (book.PageCount < 10 || book.PageCount > 2000)
+        //    {
+        //        throw new ArgumentException("Ivalid pages count");
+        //    }
+        //}
     }
 }

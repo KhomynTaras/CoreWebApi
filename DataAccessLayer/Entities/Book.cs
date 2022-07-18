@@ -1,8 +1,6 @@
-﻿using DAL.Entities;
-using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace DAL.Entities
+namespace DataAccessLayer.Entities
 {
     public class Book : BaseEntity
     {
@@ -18,9 +16,6 @@ namespace DAL.Entities
         [MinLength(3)]
         [MaxLength(30)]
         public string Author { get; set; }
-
-        [Required]
-        public int PageCount { get; set; }
 
         [Required]
         public int Price { get; set; }
