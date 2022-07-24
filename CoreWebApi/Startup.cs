@@ -27,8 +27,6 @@ namespace CoreWebApi
             services.AddDbContext<EFCoreDBContext>(options =>
                         options.UseSqlServer(Configuration["ConnectionStrings:Default"]));
 
-
-
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
