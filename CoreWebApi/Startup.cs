@@ -1,4 +1,4 @@
-using BL.Services;
+using BL.Services.BooksServices;
 using DataAccessLayer.Contexts;
 using DataAccessLayer.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -36,7 +36,8 @@ namespace CoreWebApi
             });
 
             services.AddScoped(typeof(IGerericRepository<>), typeof(GerericRepository<>));
-            services.AddScoped<IBooksService, BooksService>();
+            services.AddScoped<IBookService, BookService>();
+            services.AddScoped<IBookRepository, BookRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

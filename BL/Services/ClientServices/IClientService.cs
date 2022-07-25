@@ -1,6 +1,6 @@
 ﻿using DataAccessLayer.Entities;
 
-namespace BL.Services
+namespace BL.Services.ClientServices
 {
     public interface IClientService
     {
