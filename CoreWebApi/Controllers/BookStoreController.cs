@@ -1,6 +1,8 @@
-﻿using BL.DTOs;
+﻿using BL;
+using BL.DTOs;
 using BL.Services.BooksServices;
 using DataAccessLayer.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -37,6 +39,7 @@ namespace CoreWebApi.Controllers
             }
         }
 
+        [Authorize(Roles = Roles.Reader)]
         [HttpGet("all")]
         public async Task<IEnumerable<Book>> GetAllBooks()
         {

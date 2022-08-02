@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,6 +46,11 @@ namespace DataAccessLayer.Repositories
             _dBContext.Entry(item).State = EntityState.Modified;
 
             return await _dBContext.SaveChangesAsync() > 0;
+        }
+
+        public async Task<T> GetByPredicate(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).FirstOrDefaultAsync();
         }
 
         public async Task<bool> RemoveById(Guid id)

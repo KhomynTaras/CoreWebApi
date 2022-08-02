@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace DataAccessLayer.Repositories
         Task<IEnumerable<T>> GetAll();
         Task<T> GetById(Guid id);
         Task<bool> RemoveById(Guid id);
-        Task<bool> Update(T item); 
+        Task<bool> Update(T item);
+        Task<T> GetByPredicate(Expression<Func<T, bool>> predicate);
     }
 }

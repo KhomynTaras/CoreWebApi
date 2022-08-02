@@ -18,6 +18,6 @@ namespace DataAccessLayer.Entities
         public string Author { get; set; }
 
         [Required]
-        public int Price { get; set; }
+        public float Price { get; set; }
     }
 }
