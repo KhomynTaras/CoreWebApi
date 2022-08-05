@@ -1,5 +1,8 @@
-﻿using BL.Services;
+﻿using BL;
+using BL.DTOs;
+using BL.Services.BooksServices;
 using DataAccessLayer.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,10 +15,10 @@ namespace CoreWebApi.Controllers
     [Route("[controller]")]
     public class BookStoreController : ControllerBase
     {
-        private readonly IBooksService _booksService;
+        private readonly IBookService _booksService;
         private readonly ILogger<BookStoreController> _logger;
 
-        public BookStoreController(IBooksService booksService,  ILogger<BookStoreController> logger)
+        public BookStoreController(IBookService booksService,  ILogger<BookStoreController> logger)
         {
             _booksService = booksService;
             _logger = logger;
@@ -36,6 +39,7 @@ namespace CoreWebApi.Controllers
             }
         }
 
+        [Authorize(Roles = Roles.Reader)]
         [HttpGet("all")]
         public async Task<IEnumerable<Book>> GetAllBooks()
         {
@@ -49,12 +53,18 @@ namespace CoreWebApi.Controllers
             return await _booksService.GetBookById(id);
         }
 
-        //[Route("[action]/{author}")]
-        //[HttpGet]
-        //public IEnumerable<Book> GetBooksByAuthor(string author)
-        //{
-        //    return _booksService.GetBookByAuthor(author);
-        //}
+        [Route("[action]/{author}")]
+        [HttpGet]
+        public async Task<IEnumerable<Book>> GetBooksByAuthor(string author)
+        {
+            return await _booksService.GetBookByAuthor(author);
+        }
+
+        [HttpGet("full/{id}")]
+        public async Task<BookDto> GetFullBookInfoById(Guid id)
+        {
+            return await _booksService.GetBookFullInfo(id);
+        }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(Guid id, Book book)

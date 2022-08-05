@@ -5,16 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BL.Services
+namespace BL.Services.ClientServices
 {
     public class ClientService : IClientService
     {
-        public bool RentABook(Book book, Client client)
+        public bool RentABook(Book book, User client)
         {
             throw new NotImplementedException();
         }
 
-        public bool ReturnABook(Book book, Client client)
+        public bool ReturnABook(Book book, User client)
         {
             throw new NotImplementedException();
         }
