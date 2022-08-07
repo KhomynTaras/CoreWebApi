@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
 {
-    public interface IGerericRepository<T> where T : BaseEntity, new()
+    public interface IGenericRepository<T> where T : BaseEntity, new()
     {
         Task<Guid> Add(T item);
         Task<IEnumerable<T>> GetAll();
         Task<T> GetById(Guid id);
         Task<bool> RemoveById(Guid id);
         Task<bool> Update(T item);
-        Task<T> GetByPredicate(Expression<Func<T, bool>> predicate);
+        Task<T> GetByPredicate(Expression<Func<T, bool>> predicate);      
+        Task<IEnumerable<T>> GetAllByPredicate(Expression<Func<T, bool>> predicate);
     }
 }

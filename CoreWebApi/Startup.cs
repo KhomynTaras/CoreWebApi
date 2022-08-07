@@ -1,6 +1,9 @@
 using BL.Auth;
+using BL.Options;
 using BL.Services.AuthServices;
 using BL.Services.BooksServices;
+using BL.Services.HashServices;
+using BL.Services.LibraryService;
 using DataAccessLayer.Contexts;
 using DataAccessLayer.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
+using System.Text;
 
 namespace CoreWebApi
 {
@@ -28,18 +31,22 @@ namespace CoreWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "CoreWebApi", Version = "v1" });
-            });
+            services.AddHttpContextAccessor();
 
-            services.AddScoped(typeof(IGerericRepository<>), typeof(GerericRepository<>));
+            services.Configure<AuthOptions>(options =>
+               Configuration.GetSection(nameof(AuthOptions)).Bind(options));
+
+            var authOptions = Configuration.GetSection(nameof(AuthOptions)).Get<AuthOptions>();
+
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IBookService, BookService>();
             services.AddScoped<IBookRepository, BookRepository>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ILibraryService, LibraryService>();
+            services.AddScoped<ITokenGenerator, TokenGenerator>();
+            services.AddScoped<IHashService, HashService>();
 
-            services.AddDbContext<EFCoreDBContext>(options =>
+            services.AddDbContext<EFCoreDBContext>(options => 
             options.UseSqlServer(Configuration["ConnectionStrings:Default"], b =>b.MigrationsAssembly("DataAccessLayer")));
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -48,25 +55,29 @@ namespace CoreWebApi
                         options.RequireHttpsMetadata = false;
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
-                            // укзывает, будет ли валидироваться издатель при валидации токена
                             ValidateIssuer = true,
-                            // строка, представляющая издателя
-                            ValidIssuer = AuthOptions.ISSUER,
-
-                            // будет ли валидироваться потребитель токена
+                            ValidIssuer = authOptions.Issuer,
                             ValidateAudience = true,
-                            // установка потребителя токена
-                            ValidAudience = AuthOptions.AUDIENCE,
-                            // будет ли валидироваться время существования
+                            ValidAudience = authOptions.Audience,
                             ValidateLifetime = true,
-
-                            // установка ключа безопасности
-                            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                            // валидация ключа безопасности
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(authOptions.Key)),
                             ValidateIssuerSigningKey = true,
                         };
                     });
             services.AddControllersWithViews();
+
+            services.AddControllers();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "CoreWebApi", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

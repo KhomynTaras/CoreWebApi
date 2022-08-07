@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
 {
-    public class GerericRepository<T> : IGerericRepository<T> where T : BaseEntity, new()
+    public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity, new()
     {
         private readonly EFCoreDBContext _dBContext;
         private readonly DbSet<T> _dbSet;
 
-        public GerericRepository(EFCoreDBContext dBContext)
+        public GenericRepository(EFCoreDBContext dBContext)
         {
             _dBContext = dBContext;
             _dbSet = _dBContext.Set<T>();
@@ -51,6 +51,11 @@ namespace DataAccessLayer.Repositories
         public async Task<T> GetByPredicate(Expression<Func<T, bool>> predicate)
         {
             return await _dbSet.Where(predicate).FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<T>> GetAllByPredicate(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).ToListAsync();
         }
 
         public async Task<bool> RemoveById(Guid id)

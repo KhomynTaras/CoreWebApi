@@ -10,10 +10,10 @@ namespace BL.Services.BooksServices
 {
     public class BookService : IBookService
     {
-        private readonly IGerericRepository<Book> _genericBookRepository;
+        private readonly IGenericRepository<Book> _genericBookRepository;
         private readonly IBookRepository _bookRepository;
 
-        public BookService(IGerericRepository<Book> booksRepository, IBookRepository bookRepository)
+        public BookService(IGenericRepository<Book> booksRepository, IBookRepository bookRepository)
         {
             _genericBookRepository = booksRepository;
             _bookRepository = bookRepository;
