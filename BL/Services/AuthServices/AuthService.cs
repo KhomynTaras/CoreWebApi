@@ -1,28 +1,35 @@
 ﻿using DataAccessLayer.Repositories;
 using DataAccessLayer.Entities;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using BL.Auth;
+using BL.DTOs;
+using BL.Services.HashServices;
 
 namespace BL.Services.AuthServices
 {
     public class AuthService : IAuthService
     {
-        private readonly IGerericRepository<User> _genericClientRepository;
-        private readonly IGerericRepository<Role> _genericRoleRepository;
+        private readonly IGenericRepository<User> _genericClientRepository;
+        private readonly IGenericRepository<Role> _genericRoleRepository;
+        private readonly ITokenGenerator _tokenGenerator;
+        private readonly IHashService _hashService;
 
-        public AuthService(IGerericRepository<User> genericClientRepository, IGerericRepository<Role> genericRoleRepository)
+        public AuthService(
+            IGenericRepository<User> genericClientRepository,
+            IGenericRepository<Role> genericRoleRepository,
+            ITokenGenerator tokenGenerator,
+            IHashService hashService)
         {
             _genericClientRepository = genericClientRepository;
             _genericRoleRepository = genericRoleRepository;
+            _tokenGenerator = tokenGenerator;
+            _hashService = hashService;
         }
 
         public async Task<string> SignIn(string login, string password)
         {
-            var user = await _genericClientRepository.GetByPredicate(x => x.Email == login && x.Password == password);
+            var user = await _genericClientRepository.GetByPredicate(x => x.Email == login && x.Password == _hashService.HashString(password));
 
             if (user == null)
             {
@@ -31,7 +38,26 @@ namespace BL.Services.AuthServices
 
             var role = user.RoleId.HasValue ? (await _genericRoleRepository.GetById(user.RoleId.Value)).Name : Roles.Reader;
 
-            return TokenGenerator.GenerateToken(user.Email, role);
+            return _tokenGenerator.GenerateToken(user.Email, role);
+        }
+
+        public async Task<Guid> SignUp(UserDto user)
+        {
+            user.Password = _hashService.HashString(user.Password);
+
+            return await _genericClientRepository.Add(Map(user));
+        }
+
+        private User Map(UserDto userDto)
+        {
+            return new User
+            {
+                FirstName = userDto.FirstName,
+                LastName = userDto.LastName,
+                Password = userDto.Password,
+                Email = userDto.Email,
+                BirthDate = userDto.BirthDate
+            };
         }
     }
 }
